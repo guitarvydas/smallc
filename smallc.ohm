@@ -73,7 +73,7 @@ Hier10 =
   
 Hier11 = 
   | Primary "[" Expression "]" -- subscripted
-  | Primary "(" Expression ")" -- functioncall
+  | Primary "(" Expression? ")" -- functioncall
   | Primary -- basic
 
 Primary =
