@@ -14,7 +14,7 @@ npmstuff:
 	npm install js-beautify
 
 smallc:
-	bred/bred ${here}/comments.bred ${bdir} <junk.c
+	bred/bred ${here}/comments.bred ${bdir} <sample.c
 
 ipre:
-	./fab/fab - pre pre.ohm identitypre.fab <junk.c
+	./fab/fab - pre pre.ohm identitypre.fab <sample.c
