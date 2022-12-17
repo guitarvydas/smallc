@@ -1,0 +1,12 @@
+pre {
+manytop = top*
+top =
+  | string
+  | char
+  | ~dq any
+
+string = dq (~dq any)* dq
+char = sq (~sq any)* sq
+sq = "'"
+dq = "\""
+}

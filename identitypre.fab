@@ -1,0 +1,12 @@
+pre {
+manytop [top*] = ‛«top»’
+top [x] = ‛«x»’
+string [dq1 cs* dq2] = ‛“«dq1»«cs»«dq2»”’
+char [sq1 cs* sq2] = ‛“«sq1»«cs»«sq2»”’
+dq  [c] = ‛«c»’
+}
+
+
+
+
+

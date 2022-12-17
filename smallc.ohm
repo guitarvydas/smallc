@@ -1,0 +1,28 @@
+smallc {
+TopLevel =
+  | Asm
+  | Include
+  | Define
+  | GlobalVariable
+  | Function
+
+Asm = "#asm" (~"#endasm" any)+ "#endasm"
+Include = "#include" includeName
+Define = "#define" id Expression
+GlobalVariable = Type id ";"
+Function = id "(" Formal* ")" ListOf<FormalDeclaration, ","> ";" Compound
+
+
+Formal = id
+FormalDeclaration = Type ParameterDecl
+ParameterDecl = "*"? ParameterID "[]"?
+ParameterID = id
+
+Type = "int" | "char"
+
+id = letter idRest*
+idRest = "_" | letter | alnum
+
+comment = "/*" (~"*/" any)* "*/"
+space += comment
+}
