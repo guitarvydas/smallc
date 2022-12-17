@@ -1,4 +1,5 @@
 smallc {
+Main = TopLevel+
 TopLevel =
   | Asm
   | Include
@@ -9,20 +10,68 @@ TopLevel =
 Asm = "#asm" (~"#endasm" any)+ "#endasm"
 Include = "#include" includeName
 Define = "#define" id Expression
-GlobalVariable = Type id ";"
-Function = id "(" Formal* ")" ListOf<FormalDeclaration, ","> ";" Compound
+GlobalVariable = Variables
+Function =
+  | id "(" Formal+ ")" FormalDeclarations Compound -- withformals
+  | id "(" ")" Compound -- noformals
 
-
+FormalDeclarations = ListOf<FormalDeclaration, ","> ";"
 Formal = id
-FormalDeclaration = Type ParameterDecl
-ParameterDecl = "*"? ParameterID "[]"?
+FormalDeclaration = VariableDecl
 ParameterID = id
 
 Type = "int" | "char"
 
+Compound = "{" Statement* "}"
+
+Statement =
+  | Compound
+  | LocalVariables
+  | FunctionCall
+  | If
+  | While
+  | Assignment
+
+LocalVariables = Variables
+FunctionCall = id "(" Actual* ")" ";"
+If =
+  | "if" "(" Expression ")" Statement "else" Statement -- ifthenelse
+  | "if" "(" Expression ")" Statement -- ifthen
+
+While = "while" "(" Expression ")" Statement
+
+Assignment = Lval "=" Expression ";"
+
+Lval = "*"? id Index?
+
+Index = "[" Expression "]"
+
+Variables = ListOf<VariableDecl, ","> ";"
+VariableDecl = Type "*"? id "[]"? Initialization?
+Initialization = "=" Expression
+
+Expression =
+  | string
+  | char
+  | number
+  | FunctionCallExpression
+
+Actual = Expression
+
+string = dq (~dq any)* dq
+char = sq (~sq any)* sq
+sq = "'"
+dq = "\""
+number = digit+
+FunctionCallExpression = "*"? id "(" Actual* ")" Index?
+  
 id = letter idRest*
 idRest = "_" | letter | alnum
 
+includeName =
+  | string -- string
+  | "<" id ("." id)* ">" -- sys
+  
 comment = "/*" (~"*/" any)* "*/"
 space += comment
 }
