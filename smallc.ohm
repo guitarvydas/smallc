@@ -51,38 +51,37 @@ Variables = ListOf<VariableDecl, ","> ";"
 VariableDecl = Type? "*"? id DeclarationIndex? Initialization?
 Initialization = "=" Expression
 
-Expression =
-  | AssignmentExpression
-  | AndOrExpression
-AssignmentExpression = Lval "=" Expression
-AndOrExpression =
-  | OrExpression
-  | AndExpression
+Expression = Hier1
+Hier1 = Hier2 ("=" ~"=" Hier1)*
+Hier2 = Hier3 ("|" Hier3)*
+Hier3 = Hier4 ("^" Hier4)*
+Hier4 = Hier5 ("&" Hier5)*
+Hier5 = Hier6 (("==" | "!=") Hier6)*
+Hier6 = Hier7 ( ((">" ~">") | ("<" ~"<") | "<=" | ">=") Hier7)*
+Hier7 = Hier8 ((">>" | "<<") Hier8)*
+Hier8 = Hier9 (( ("+" ~"+") | ("-" ~"-")) Hier9)*
+Hier9 = Hier10 (("*" | "/" | "%") Hier10)*
 
-ParenthesizedExpression = "(" Expression ")"
-OrExpression = BooleanExpression ("|" BooleanExpression)?
-AndExpression = BooleanExpression ("&" BooleanExpression)?
-BooleanExpression = AdditiveExpression (booleanop AdditiveExpression)?
+Hier10 =
+  | "++" Hier11 -- preinc
+  | "--" Hier11 -- predec
+  | "*" Hier11  -- indir
+  | "&" Hier11  -- addr
+  | Hier11 "++" -- postinc
+  | Hier11 "--" -- postdec
+  | Hier11 -- basic
+  
+Hier11 = 
+  | Primary "[" Expression "]" -- subscripted
+  | Primary "(" Expression ")" -- functioncall
+  | Primary -- basic
 
-AdditiveExpression =
-  | MulExpr ("+" MulExpr)?
-  | MulExpr ("-" MulExpr)?
-MulExpr =
-  | UnaryExpr ("*" UnaryExpr)?
-  | UnaryExpr ("/" UnaryExpr)?
-UnaryExpr =
-  | "!" Primary -- not
-  | "~" Primary -- complement
-  | "-" Primary -- minus
-  | "+" Primary -- plus
-  | Primary -- primary
 Primary =
-  | ParenthesizedExpression
-  | string
-  | char
-  | number
-  | FunctionCallExpression
-  | Lval
+  | "(" Expression ")" -- parenthesizedexpr
+  | string -- string
+  | char -- char
+  | number -- number
+  | id -- id
 
 booleanop =
   | "=="
