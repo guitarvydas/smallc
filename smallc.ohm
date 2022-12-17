@@ -45,17 +45,51 @@ Assignment = Lval "=" Expression ";"
 Lval = "*"? id Index?
 
 Index = "[" Expression "]"
+DeclarationIndex = "[" number? "]"
 
 Variables = ListOf<VariableDecl, ","> ";"
-VariableDecl = Type "*"? id "[]"? Initialization?
+VariableDecl = Type? "*"? id DeclarationIndex? Initialization?
 Initialization = "=" Expression
 
 Expression =
+  | AssignmentExpression
+  | AndOrExpression
+AssignmentExpression = Lval "=" Expression
+AndOrExpression =
+  | OrExpression
+  | AndExpression
+
+ParenthesizedExpression = "(" Expression ")"
+OrExpression = BooleanExpression ("|" BooleanExpression)?
+AndExpression = BooleanExpression ("&" BooleanExpression)?
+BooleanExpression = AdditiveExpression (booleanop AdditiveExpression)?
+
+AdditiveExpression =
+  | MulExpr ("+" MulExpr)?
+  | MulExpr ("-" MulExpr)?
+MulExpr =
+  | UnaryExpr ("*" UnaryExpr)?
+  | UnaryExpr ("/" UnaryExpr)?
+UnaryExpr =
+  | "!" Primary -- not
+  | "~" Primary -- complement
+  | "-" Primary -- minus
+  | "+" Primary -- plus
+  | Primary -- primary
+Primary =
+  | ParenthesizedExpression
   | string
   | char
   | number
   | FunctionCallExpression
+  | Lval
 
+booleanop =
+  | "=="
+  | "!="
+  | "<="
+  | ">="
+  
 Actual = Expression
 
 string = dq (~dq any)* dq
