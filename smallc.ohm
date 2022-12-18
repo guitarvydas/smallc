@@ -70,10 +70,10 @@ Hier8 = Hier9 (( ("+" ~"+") | ("-" ~"-")) Hier9)*
 Hier9 = Hier10 (("*" | "/" | "%") Hier10)*
 
 Hier10 =
-  | "++" Hier11 -- preinc
-  | "--" Hier11 -- predec
-  | "*" Hier11  -- indir
-  | "&" Hier11  -- addr
+  | "++" Hier10 -- preinc
+  | "--" Hier10 -- predec
+  | "*" Hier10  -- indir
+  | "&" Hier10  -- addr
   | "+" Hier11  -- plus
   | "-" Hier11  -- minus
   | Hier11 "++" -- postinc
