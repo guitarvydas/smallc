@@ -12,15 +12,15 @@ Include = "#include" includeName
 Define = "#define" id Expression
 GlobalVariable = Variables
 Function =
-  | id "(" ListOf<Formal, ","> ")" FormalDeclarations+ Compound -- withformals
-  | id "(" ")" Compound -- noformals
+  | Type? id "(" ListOf<Formal, ","> ")" FormalDeclarations+ Compound -- withformals
+  | Type? id "(" ")" Compound -- noformals
 
 FormalDeclarations = ListOf<FormalDeclaration, ","> ";"
 Formal = id
 FormalDeclaration = VariableDecl
 ParameterID = id
 
-Type = "int" | "char"
+Type = kwint | kwchar
 
 Compound = "{" Statement* "}"
 
@@ -39,17 +39,17 @@ Statement =
 LocalVariables = Variables
 FunctionCall = id "(" ListOf<Actual,","> ")" ";"
 If =
-  | "if" "(" Expression ")" Statement "else" Statement -- ifthenelse
-  | "if" "(" Expression ")" Statement -- ifthen
+  | kwif "(" Expression ")" Statement kwelse Statement -- ifthenelse
+  | kwif "(" Expression ")" Statement -- ifthen
 
-While = "while" "(" Expression ")" Statement
-Return = "return" Expression? ";"
-Break = "break" ";"
-Continue = "continue" ";"
+While = kwwhile "(" Expression ")" Statement
+Return = kwreturn Expression? ";"
+Break = kwbreak ";"
+Continue = kwcontinue ";"
 
 Assignment = Lval "=" Expression ";"
 
-Lval = "*"? id Index?
+Lval = Hier10
 
 Index = "[" Expression "]"
 DeclarationIndex = "[" Expression? "]"
@@ -105,8 +105,17 @@ char = sq (~sq any)* sq
 sq = "'"
 dq = "\""
 number = digit+
-  
-id = letter idRest*
+
+kwint = "int" ~idRest
+kwchar = "char" ~idRest
+kwif = "if" ~idRest
+kwelse = "else" ~idRest
+kwwhile = "while" ~idRest
+kwbreak = "break" ~idRest
+kwcontinue = "continue" ~idRest
+kwreturn = "return" ~idRest
+keyword = kwint | kwchar | kwif | kwelse | kwwhile | kwbreak | kwcontinue | kwreturn
+id = ~keyword letter idRest*
 idRest = "_" | letter | alnum
 
 includeName =
