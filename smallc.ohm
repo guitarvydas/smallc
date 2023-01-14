@@ -10,14 +10,13 @@ TopLevel =
 Asm = "#asm" (~"#endasm" any)+ "#endasm"
 Include = "#include" includeName
 Define = "#define" id Expression
-GlobalVariable = Variables
+GlobalVariable = TypedVariableDecl
 Function =
-  | Type? id "(" ListOf<Formal, ","> ")" FormalDeclarations+ Compound -- withformals
+  | Type? id "(" ListOf<Formal, ","> ")" FormalDeclaration+ Compound -- withformals
   | Type? id "(" ")" Compound -- noformals
 
-FormalDeclarations = ListOf<FormalDeclaration, ","> ";"
+FormalDeclaration = TypedVariableDecl
 Formal = id
-FormalDeclaration = VariableDecl
 ParameterID = id
 
 Type = kwint | kwchar
@@ -26,17 +25,18 @@ Compound = "{" Statement* "}"
 
 Statement =
   | Compound
-  | LocalVariables
+  | LocalVariable
   | If
   | While
   | Return
   | Break
   | Continue
+  | EmptyStatement
   | FunctionCall
   | Assignment
-  | Expression
+  | ExpressionStatement
   
-LocalVariables = Variables
+LocalVariable = TypedVariableDecl
 FunctionCall = id "(" ListOf<Actual,","> ")" ";"
 If =
   | kwif "(" Expression ")" Statement kwelse Statement -- ifthenelse
@@ -48,17 +48,28 @@ Break = kwbreak ";"
 Continue = kwcontinue ";"
 
 Assignment = Lval "=" Expression ";"
+ExpressionStatement = Expression ";"
+EmptyStatement = ";"
 
 Lval = Hier10
 
 Index = "[" Expression "]"
 DeclarationIndex = "[" Expression? "]"
 
-Variables = ListOf<VariableDecl, ","> ";"
-VariableDecl = Type? "*"? id DeclarationIndex? Initialization?
+TypedVariableDecl = Type ListOf<VariableDeclBody,","> ";"
+VariableDeclBody = "*"? id DeclarationIndex? Initialization?
 Initialization = "=" Expression
 
-Expression = Hier1
+Expression = 
+  | simpleAtomExpression
+  | Hier1
+
+simpleAtomExpression =
+  | string -- string
+  | char -- char
+  | number -- number
+  | id &(";" | ")" | "]") -- id
+
 Hier1 = Hier2 ("=" ~"=" Hier1)*
 Hier2 = Hier3 ("|" Hier3)*
 Hier3 = Hier4 ("^" Hier4)*
@@ -87,6 +98,8 @@ Hier11 =
 
 Primary =
   | "(" Expression ")" -- parenthesizedexpr
+  | Atom -- atom
+Atom =
   | string -- string
   | char -- char
   | number -- number
